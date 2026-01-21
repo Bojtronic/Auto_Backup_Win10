@@ -2,29 +2,20 @@
 # CONFIGURACIÓN GENERAL
 # ============================
 
-# Carpeta base en el equipo remoto (UNC)
 $origenBase  = "\\Atm-naranjo\E\Store02"
-
-# Carpeta destino local
 $destinoBase = "D:\Backup"
-
-# Cantidad de días hacia atrás (incluye HOY)
-$diasAtras = 120
+$diasAtras   = 120
 
 
 # ============================
 # GENERAR LISTA DE MMDD VÁLIDOS
 # ============================
 
-# Fecha actual normalizada
 $hoy = (Get-Date).Date
-
-# Conjunto de carpetas válidas (MMDD)
 $carpetasValidas = @{}
 
 for ($i = 0; $i -le $diasAtras; $i++) {
-    $fecha = $hoy.AddDays(-$i)
-    $mmdd  = $fecha.ToString("MMdd")
+    $mmdd = $hoy.AddDays(-$i).ToString("MMdd")
     $carpetasValidas[$mmdd] = $true
 }
 
@@ -37,7 +28,7 @@ $robocopy = "C:\Windows\System32\Robocopy.exe"
 
 
 # ============================
-# RECORRIDO DE CÁMARAS
+# COPIA DE CARPETAS VÁLIDAS
 # ============================
 
 Get-ChildItem $origenBase -Directory | ForEach-Object {
@@ -49,18 +40,12 @@ Get-ChildItem $origenBase -Directory | ForEach-Object {
         New-Item -ItemType Directory -Path $destinoCamara | Out-Null
     }
 
-    # ============================
-    # RECORRIDO DE CARPETAS MMDD
-    # ============================
-
     Get-ChildItem $camara.FullName -Directory | ForEach-Object {
 
         $nombre = $_.Name
 
-        # Validar formato MMDD
         if ($nombre -match '^(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$') {
 
-            # Si la carpeta está dentro del rango válido
             if ($carpetasValidas.ContainsKey($nombre)) {
 
                 $origenFinal  = $_.FullName
@@ -76,6 +61,30 @@ Get-ChildItem $origenBase -Directory | ForEach-Object {
                     /W:1 `
                     /XJ `
                     /XD "System Volume Information" "$RECYCLE.BIN"
+            }
+        }
+    }
+}
+
+
+# ============================
+# LIMPIEZA DEL DESTINO (CLAVE)
+# ============================
+
+Get-ChildItem $destinoBase -Directory | ForEach-Object {
+
+    $destinoCamara = $_
+
+    Get-ChildItem $destinoCamara.FullName -Directory | ForEach-Object {
+
+        $nombre = $_.Name
+
+        if ($nombre -match '^(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$') {
+
+            if (-not $carpetasValidas.ContainsKey($nombre)) {
+
+                Write-Host "Eliminando carpeta antigua: $($_.FullName)"
+                Remove-Item $_.FullName -Recurse -Force
             }
         }
     }
