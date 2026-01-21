@@ -52,18 +52,20 @@ Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitor
 
 Este comando se compone de las siguientes partes:
 
-1.  Robocopy.exe
+1.  Robocopy.exe:
+
 Ejecutable de la herramienta Robocopy.
 
-2.  Ruta del origen
-Carpeta desde donde se copiarán los archivos.
-👉 "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN"
+2.  Ruta del origen:
 
-3.  Ruta del destino
-Carpeta donde se copiarán los archivos.
-👉 "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO"
+Carpeta desde donde se copiarán los archivos. 👉 "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN"
 
-4.  Parámetros
+3.  Ruta del destino:
+
+Carpeta donde se copiarán los archivos. 👉 "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO"
+
+4.  Parámetros:
+
 Opciones que controlan el comportamiento de la copia:
 
     -   /E → Copia subcarpetas, incluso las vacías.
