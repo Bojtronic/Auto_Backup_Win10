@@ -1,0 +1,1 @@
+C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"

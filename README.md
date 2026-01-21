@@ -1,210 +1,263 @@
-# 🧭 Guía completa para ejecutar el script de Backup (120 días)
+# 📦 Sistema de Backups con Robocopy y PowerShell
 
-Este documento explica **paso a paso** cómo ejecutar manualmente y cómo
-programar el script PowerShell que copia únicamente las carpetas
-correspondientes a los **últimos 120 días**.
+Este repositorio contiene scripts y documentación para implementar un
+**sistema de copias de seguridad automatizado** utilizando **Robocopy**
+y **PowerShell** en sistemas Windows.
+
+> 📌 **Entorno de pruebas:** Todos los procedimientos, comandos y
+> scripts descritos fueron **probados en Windows 10**.
 
 ------------------------------------------------------------------------
 
-## 1️⃣ Guardar el script correctamente
+## 📑 Contenido
 
-1.  Abre **Bloc de notas**
-2.  Copia todo el script PowerShell proporcionado
-3.  Guarda el archivo con las siguientes opciones:
+-   [🚀 ¿Qué es Robocopy?](#-qué-es-robocopy)
+-   [📄 Archivos `.bat`](#-archivos-bat)
+    -   [📁 BACKUP_COMPLETO.bat](#-backup_completobat)
+-   [⚙️ Parámetros importantes de
+    Robocopy](#-parámetros-importantes-de-robocopy)
+-   [❗ Buenas prácticas al copiar discos
+    completos](#-buenas-prácticas-al-copiar-discos-completos)
+-   [🧠 Scripts PowerShell (.ps1)](#-scripts-powershell-ps1)
+-   [🧭 Guía para ejecutar scripts
+    `.ps1`](#-guía-para-ejecutar-scripts-ps1)
+-   [⏰ Programar el backup con el Programador de
+    tareas](#-programar-el-backup-con-el-programador-de-tareas)
+-   [✅ Resultado final](#-resultado-final)
 
-**Nombre del archivo**
+------------------------------------------------------------------------
 
-    backup_ultimos_120_dias.ps1
+## 🚀 ¿Qué es Robocopy?
+
+**Robocopy (Robust File Copy)** es una herramienta nativa de Windows
+diseñada para copiar archivos y carpetas de forma:
+
+-   ✅ Robusta\
+-   ✅ Confiable\
+-   ✅ Automatizable
+
+Ideal para procesos de **respaldo y sincronización**.
+
+### 📍 Ubicación del ejecutable
+
+``` text
+C:\Windows\System32\Robocopy.exe
+```
+
+### 📚 Documentación oficial
+
+-   Microsoft Docs:\
+    https://learn.microsoft.com/es-es/windows-server/administration/windows-commands/robocopy
+
+------------------------------------------------------------------------
+
+## 📄 Archivos `.bat`
+
+Un archivo **`.bat`** es un script por lotes que ejecuta comandos de
+Windows de forma secuencial.
+
+### 🔧 Cómo crear un archivo `.bat`
+
+1.  Crear un archivo de texto plano
+2.  Cambiar la extensión de `.txt` a `.bat`
+3.  Si las extensiones están ocultas:
+    -   Explorador de archivos → **Vista**
+    -   **Opciones**
+    -   **Cambiar opciones de carpeta y búsqueda**
+    -   Pestaña **Ver**
+    -   Desmarcar **Ocultar extensiones de archivo conocidas**
+
+✏️ El archivo puede editarse con **Bloc de notas**.
+
+------------------------------------------------------------------------
+
+## 📁 BACKUP_COMPLETO.bat
+
+Este archivo realiza una **copia completa del contenido visible de una
+unidad**, excluyendo:
+
+-   Metadatos del volumen NTFS
+-   Carpetas del sistema
+-   Papelera de reciclaje
+
+### 📜 Contenido del archivo
+
+``` bat
+C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
+```
+
+### ▶️ Ejecución
+
+Para ejecutar el backup basta con **hacer doble clic** sobre el archivo:
+
+``` text
+BACKUP_COMPLETO.bat
+```
+
+------------------------------------------------------------------------
+
+## ⚙️ Parámetros importantes de Robocopy
+
+### 🔹 `/E`
+
+Copia todos los subdirectorios, incluidos los vacíos.\
+Sin `/E` solo se copiarían carpetas con contenido.
+
+### 🔹 `/MIR`
+
+Crea un espejo del directorio origen en el destino.\
+Equivale a: `/E /PURGE`
+
+> ⚠️ **Advertencia:**\
+> Si se elimina algo en el origen, también se eliminará en el destino.
+
+### 🔹 `/R:1`
+
+Número de reintentos cuando ocurre un error al copiar un archivo.\
+Valor por defecto: **1,000,000**.
+
+### 🔹 `/W:1`
+
+Tiempo de espera entre reintentos (en segundos).\
+Valor por defecto: **30 segundos**.
+
+------------------------------------------------------------------------
+
+## ❗ Buenas prácticas al copiar discos completos
+
+❌ **Nunca copiar el root de un disco usando `/MIR`**
+
+✔️ Siempre copiar **solo el contenido visible del disco**, excluyendo:
+
+-   Metadatos del volumen NTFS
+-   Carpetas del sistema
+-   Papelera de reciclaje
+
+### ✔️ Comando recomendado
+
+``` bat
+C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
+```
+
+### 📌 Explicación de opciones adicionales
+
+  Opción        Función
+  ------------- -------------------------------------------
+  `/COPY:DAT`   Copia datos, atributos y marcas de tiempo
+  `/DCOPY:T`    Conserva fechas de las carpetas
+  `/XJ`         No sigue enlaces NTFS (junctions)
+  `/XD`         Excluye carpetas del sistema
+
+------------------------------------------------------------------------
+
+## 📝 Uso de comillas en rutas
+
+Las comillas (`" "`) son necesarias cuando las rutas contienen
+espacios.\
+Se recomienda **escribirlas manualmente** en el Bloc de notas para
+evitar errores de codificación al copiar y pegar.
+
+------------------------------------------------------------------------
+
+## 🧪 Ejemplo de backup de prueba
+
+``` bat
+Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO" /E /MIR /R:1 /W:1
+```
+
+------------------------------------------------------------------------
+
+## 🧠 Scripts PowerShell (.ps1)
+
+Un archivo **`.ps1`** es un script de PowerShell que permite automatizar
+tareas avanzadas, incluyendo:
+
+-   Lógica condicional
+-   Manejo de fechas
+-   Validaciones
+-   Registro de logs
+
+### 📂 Scripts incluidos
+
+#### 🔹 BACKUP_CARPETAS_FECHAS_RECIENTES.ps1
+
+-   Copia **carpetas completas** con nombre `MMDD`
+-   Solo dentro del rango de días configurado (por ejemplo, últimos
+    **120 días**)
+-   Elimina carpetas antiguas **solo si la copia fue exitosa**
+
+#### 🔹 BACKUP_ARCHIVOS_FECHAS_RECIENTES.ps1
+
+-   Analiza **archivo por archivo**
+-   Copia únicamente archivos del **año válido**
+-   Maneja correctamente el **cruce de año** (año actual o anterior)
+
+------------------------------------------------------------------------
+
+## 🧭 Guía para ejecutar scripts `.ps1`
+
+### 1️⃣ Guardar el script
 
 **Ubicación recomendada**
 
-    C:\Scripts
+``` text
+C:\Scripts
+```
 
-**Tipo**
-
-    Todos los archivos (*.*)
-
-**Codificación**
-
-    UTF-8
-
-📌 **Resultado final**
-
-    C:\Scripts\backup_ultimos_120_dias.ps1
+**Codificación:** UTF-8
 
 ------------------------------------------------------------------------
 
-## 2️⃣ Verificar permisos y rutas
-
-Antes de ejecutar el script, confirma que:
+### 2️⃣ Verificar requisitos
 
 -   ✔ Existe `E:\Store02`
--   ✔ Existen las carpetas `cam01`, `cam02`, `cam03`, etc.
--   ✔ Existe (o se puede crear) `D:\Backup`
--   ✔ El usuario que ejecuta el script tiene permisos de **lectura y
-    escritura**
+-   ✔ Existen carpetas `cam01`, `cam02`, etc.
+-   ✔ Existe o se puede crear `D:\Backup`
+-   ✔ Permisos de lectura y escritura
 
 ------------------------------------------------------------------------
 
-## 3️⃣ Ejecutar el script manualmente (prueba inicial)
+### 3️⃣ Ejecutar manualmente (primera vez)
 
-⚠️ **MUY IMPORTANTE:** la primera vez ejecútalo manualmente.
-
-### Paso 1 -- Abrir PowerShell como administrador
-
-1.  Presiona **Inicio**
-2.  Escribe: `PowerShell`
-3.  Clic derecho → **Ejecutar como administrador**
-
-------------------------------------------------------------------------
-
-### Paso 2 -- Permitir la ejecución del script (una sola vez)
-
-Ejecuta el siguiente comando:
+Abrir **PowerShell como administrador** y ejecutar:
 
 ``` powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 ```
 
-Cuando aparezca la pregunta:
-
-    ¿Desea cambiar la directiva de ejecución?
-
-Responde:
-
-    S
-
-📌 Esto **no desprotege el sistema**, solo permite ejecutar scripts
-locales.
-
-------------------------------------------------------------------------
-
-### Paso 3 -- Ejecutar el script
-
-En la consola de PowerShell:
+Luego ir a la ubicación del archivo y ejecutarlo:
 
 ``` powershell
 cd C:\Scripts
-.\backup_ultimos_120_dias.ps1
+.\BACKUP.ps1
 ```
 
-✔ El script debe comenzar a copiar carpetas\
-✔ No deben aparecer errores en rojo\
-✔ Verifica que se creen carpetas en `D:\Backup\camXX`
+------------------------------------------------------------------------
+
+## ⏰ Programar el backup con el Programador de tareas
+
+Configurar una nueva tarea con:
+
+-   **Programa:** `powershell.exe`
+-   **Argumentos:**
+
+``` text
+-ExecutionPolicy Bypass -File "C:\Scripts\BACKUP.ps1"
+```
+
+### ⚙️ Recomendaciones
+
+-   ✔ Ejecutar con privilegios más altos
+-   ✔ Frecuencia: diaria
+-   ✔ Reintentos: 3 cada 5 minutos
 
 ------------------------------------------------------------------------
 
-## 4️⃣ Validar el resultado
-
-Revisa que existan carpetas como:
-
-    D:\Backup\cam01\0101
-    D:\Backup\cam02\1231
-
-❌ Carpetas fuera del rango de 120 días (por ejemplo `0615`) **NO deben
-copiarse**
-
-------------------------------------------------------------------------
-
-# ⏰ Agregar el script al Programador de tareas
-
-## 5️⃣ Abrir el Programador de tareas
-
-1.  Presiona **Win + R**
-
-2.  Escribe:
-
-        taskschd.msc
-
-3.  Presiona **Enter**
-
-------------------------------------------------------------------------
-
-## 6️⃣ Crear la tarea (forma correcta)
-
-1.  Clic en **Crear tarea**\
-    ⚠️ **NO usar "Crear tarea básica"**
-
-------------------------------------------------------------------------
-
-### 🔹 Pestaña **General**
-
--   **Nombre**
-
-        Backup Store02 - últimos 120 días
-
--   **Descripción**
-
-        Copia diaria de cámaras (últimos 120 días)
-
--   Marca:
-
-    -   ✅ Ejecutar con los privilegios más altos
-    -   ✅ Ejecutar tanto si el usuario inició sesión como si no
-
-------------------------------------------------------------------------
-
-### 🔹 Pestaña **Desencadenadores**
-
-1.  Clic en **Nuevo**
-2.  Configura:
-    -   Iniciar la tarea: **Según una programación**
-    -   Configuración: **Diariamente**
-    -   Hora: la deseada (ej. 01:00 AM)
-3.  Clic en **Aceptar**
-
-------------------------------------------------------------------------
-
-### 🔹 Pestaña **Acciones**
-
-1.  Clic en **Nuevo**
-
-2.  Acción: **Iniciar un programa**
-
-3.  **Programa o script**
-
-        powershell.exe
-
-4.  **Agregar argumentos**
-
-        -ExecutionPolicy Bypass -File "C:\Scripts\backup_ultimos_120_dias.ps1"
-
-5.  **Iniciar en**
-
-        C:\Scripts
-
-------------------------------------------------------------------------
-
-### 🔹 Pestaña **Condiciones** (recomendado)
-
-Desmarcar:
-
--   ❌ Iniciar la tarea solo si el equipo está con corriente alterna (si
-    es servidor)
--   ❌ Detener si el equipo cambia a batería
-
-------------------------------------------------------------------------
-
-### 🔹 Pestaña **Configuración**
-
-Marcar:
-
--   ✅ Permitir que la tarea se ejecute a petición
--   ✅ Si la tarea falla, reiniciar cada: **5 minutos**
--   **Intentos:** 3
-
-------------------------------------------------------------------------
-
-## 7️⃣ Probar la tarea
-
-1.  Selecciona la tarea creada
-2.  Clic derecho → **Ejecutar**
-3.  Verifica que el backup se ejecute correctamente
-
-------------------------------------------------------------------------
-
-## ✅ Listo
+## ✅ Resultado final
 
 El sistema de backup quedará ejecutándose **automáticamente todos los
-días**, copiando únicamente los últimos **120 días reales**, sin
-depender del año.
+días**, copiando únicamente los datos **relevantes**, de forma:
+
+-   🔐 Segura
+-   🎯 Controlada
+-   ⚡ Eficiente
