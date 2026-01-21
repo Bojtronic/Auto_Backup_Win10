@@ -7,6 +7,10 @@ y **PowerShell** en sistemas Windows.
 > 📌 **Entorno de pruebas:** Todos los procedimientos, comandos y
 > scripts descritos fueron **probados en Windows 10**.
 
+
+
+**REVISAR EL ARCHIVO LLAMADO "Manual de usuario.pdf" EL CUAL SE INCLUYE EN ESTE REPOSITORIO**
+
 ------------------------------------------------------------------------
 
 ## 📑 Contenido
