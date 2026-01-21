@@ -44,6 +44,36 @@ Ideal para procesos de **respaldo y sincronización**.
 C:\Windows\System32\Robocopy.exe
 ```
 
+### 🧩 Estructura básica de un comando Robocopy (ejemplo)
+
+```cmd
+Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO" /E /MIR /R:1 /W:1
+```
+
+Este comando se compone de las siguientes partes:
+
+1.  Robocopy.exe
+Ejecutable de la herramienta Robocopy.
+
+2.  Ruta del origen
+Carpeta desde donde se copiarán los archivos.
+👉 "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN"
+
+3.  Ruta del destino
+Carpeta donde se copiarán los archivos.
+👉 "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO"
+
+4.  Parámetros
+Opciones que controlan el comportamiento de la copia:
+
+    -   /E → Copia subcarpetas, incluso las vacías.
+
+    -   /MIR → Refleja el origen en el destino (sincronización espejo).
+
+    -   /R:1 → Reintenta la copia 1 vez si hay error.
+
+    -   /W:1 → Espera 1 segundo entre reintentos.
+
 ### 📚 Documentación oficial
 
 -   Microsoft Docs:\
