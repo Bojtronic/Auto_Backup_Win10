@@ -173,14 +173,12 @@ C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T
 
 ### 📌 Explicación de opciones adicionales
 
-  Opción        Función
-  ------------- -------------------------------------------
-  `/COPY:DAT`   Copia datos, atributos y marcas de tiempo
-  `/DCOPY:T`    Conserva fechas de las carpetas
-  `/XJ`         No sigue enlaces NTFS (junctions)
-  `/XD`         Excluye carpetas del sistema
-
-------------------------------------------------------------------------
+| Opción       | Función                                         |
+|-------------|-------------------------------------------------|
+| `/COPY:DAT` | Copia datos, atributos y marcas de tiempo       |
+| `/DCOPY:T`  | Conserva fechas de las carpetas                 |
+| `/XJ`       | No sigue enlaces NTFS (junctions)               |
+| `/XD`       | Excluye carpetas del sistema                    |
 
 ## 📝 Uso de comillas en rutas
 
