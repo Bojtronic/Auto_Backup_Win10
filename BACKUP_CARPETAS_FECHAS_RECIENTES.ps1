@@ -74,7 +74,7 @@ $copiaExitosa = $true
 Log-OK "===== INICIO DE BACKUP ====="
 Log-OK "Origen: $origenBase"
 Log-OK "Destino: $destinoBase"
-Log-OK "Días a conservar: $diasAtras"
+Log-OK "Dias a conservar: $diasAtras"
 
 
 # ============================================================
@@ -119,7 +119,7 @@ Get-ChildItem $origenBase -Directory | ForEach-Object {
                 # Evaluar resultado de Robocopy
                 if ($LASTEXITCODE -ge 8) {
                     $copiaExitosa = $false
-                    Log-ERR "ERROR copiando $origenFinal (Código Robocopy: $LASTEXITCODE)"
+                    Log-ERR "ERROR copiando $origenFinal (Codigo Robocopy: $LASTEXITCODE)"
                 }
             }
         }
@@ -158,5 +158,5 @@ if ($copiaExitosa) {
 
 } else {
 
-    Log-ERR "Se detectaron errores. NO se realizó limpieza del destino."
+    Log-ERR "Se detectaron errores. NO se realizo limpieza del destino."
 }

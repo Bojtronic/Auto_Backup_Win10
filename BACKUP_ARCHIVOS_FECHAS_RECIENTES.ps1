@@ -47,7 +47,7 @@ $copiaExitosa = $true
 
 "" | Set-Content $logOk
 Log-OK "===== INICIO DE BACKUP ====="
-Log-OK "Días a conservar: $diasAtras"
+Log-OK "Dias a conservar: $diasAtras"
 
 
 # ============================================================
@@ -88,7 +88,7 @@ Get-ChildItem $origenBase -Directory | ForEach-Object {
 
                     if ($anioArchivo -eq $anioValido) {
 
-                        Log-OK "Copiando archivo válido: $($_.FullName)"
+                        Log-OK "Copiando archivo valido: $($_.FullName)"
 
                         $origenArchivo = $_.DirectoryName
                         $destinoArchivo = $destinoMMDD
@@ -138,5 +138,5 @@ if ($copiaExitosa) {
     Log-OK "Backup finalizado CORRECTAMENTE"
 }
 else {
-    Log-ERR "Se detectaron errores. NO se realizó limpieza"
+    Log-ERR "Se detectaron errores. NO se realizo limpieza"
 }
