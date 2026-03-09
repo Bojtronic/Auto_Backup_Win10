@@ -50,12 +50,13 @@ function Log-ERR($msg) {
 
 # Fecha actual normalizada (sin hora)
 $hoy = (Get-Date).Date
+$manana = $hoy.AddDays(1)
 
 # HashTable con las carpetas válidas (0101, 0120, etc.)
 $carpetasValidas = @{}
 
 for ($i = 0; $i -le $diasAtras; $i++) {
-    $mmdd = $hoy.AddDays(-$i).ToString("MMdd")
+    $mmdd = $manana.AddDays(-$i).ToString("MMdd")
     $carpetasValidas[$mmdd] = $true
 }
 

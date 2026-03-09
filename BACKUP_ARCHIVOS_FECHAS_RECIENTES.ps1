@@ -30,10 +30,11 @@ function Log-ERR ($msg) { Add-Content $logError "$(Get-Date -Format 'yyyy-MM-dd 
 # ============================================================
 
 $hoy = (Get-Date).Date
+$manana = $hoy.AddDays(1)
 $fechasValidas = @{}
 
 for ($i = 0; $i -le $diasAtras; $i++) {
-    $fecha = $hoy.AddDays(-$i)
+    $fecha = $manana.AddDays(-$i)
     $fechasValidas[$fecha.ToString("MMdd")] = $fecha.Year
 }
 
