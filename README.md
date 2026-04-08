@@ -51,7 +51,7 @@ C:\Windows\System32\Robocopy.exe
 ### 🧩 Estructura básica de un comando Robocopy (ejemplo)
 
 ```cmd
-Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO" /E /MIR /R:1 /W:1
+Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO" /E /MIR /R:1 /W:1 /MT:16
 ```
 
 Este comando se compone de las siguientes partes:
@@ -80,7 +80,11 @@ Opciones que controlan el comportamiento de la copia:
 
     -   /W:1 → Espera 1 segundo entre reintentos.
 
-### 📚 Documentación oficial
+    -   /MT:16 → Crea copias multiproceso con 16 subprocesos (hilos).
+    ⚠️ ¡Cuidado! Sin el hardware apropiado más hilos solo generan overhead.
+
+
+### 📚 Documentación oficial de robocopy 
 
 -   Microsoft Docs:\
     https://learn.microsoft.com/es-es/windows-server/administration/windows-commands/robocopy
@@ -119,7 +123,7 @@ unidad**, excluyendo:
 ### 📜 Contenido del archivo
 
 ``` bat
-C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
+C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T /MT:16 /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
 ```
 
 ### ▶️ Ejecución
@@ -156,6 +160,14 @@ Valor por defecto: **1,000,000**.
 
 Tiempo de espera entre reintentos (en segundos).\
 Valor por defecto: **30 segundos**.
+
+### 🔹 `/MT:n`
+
+Crea copias multiproceso con n subprocesos (hilos). n debe ser un número entero entre 1 y 128.
+Por defaul n = 8, si no se usa este parámetro se usa 1 hilo
+⚠️ ¡Cuidado! Sin el hardware apropiado más hilos solo generan overhead. Con base en esto se hacen las siguientes sugerencias para casos extremos:
+    HDD con CPU de 2 nucleos, usar /MT:2
+    SSD con CPU de 2 nucleos, usar /MT:8
 
 ------------------------------------------------------------------------
 
@@ -213,6 +225,13 @@ tareas avanzadas, incluyendo:
 
 ### 📂 Scripts incluidos
 
+#### 🔹 BACKUP_constante.ps1
+
+-   Script de respaldo optimizado diseñado para ejecutarse de forma frecuente y continua, manteniendo actualizado el backup de los archivos recientes con el mínimo consumo posible de recursos.
+-   Analiza únicamente las carpetas correspondientes al rango de días configurado, pero solo realiza validación detallada de archivos en la carpeta correspondiente al día actual.
+-   Solo se copian archivos que existen en el origen pero aún no están en el destino.
+-   Se eliminan automáticamente las carpetas que quedan fuera del rango de días configurado.
+
 #### 🔹 BACKUP_CARPETAS_FECHAS_RECIENTES.ps1
 
 -   Copia **carpetas completas** con nombre `MMDD`
@@ -225,6 +244,19 @@ tareas avanzadas, incluyendo:
 -   Analiza **archivo por archivo**
 -   Copia únicamente archivos del **año válido**
 -   Maneja correctamente el **cruce de año** (año actual o anterior)
+
+
+## 🧠 Archivos Batch (.bat)
+
+Además de los scripts de PowerShell, se incluyen dos archivos **`.bat`** que utilizan Robocopy para realizar sincronizaciones completas entre el grabador (DVR) y el almacenamiento de respaldo (NAS).
+
+#### 🔹 BACKUP completo desde grabador a NAS.bat
+
+-   Utiliza Robocopy para copiar todo el contenido de la carpeta de origen hacia la carpeta de destino
+
+#### 🔹 BACKUP completo desde NAS a grabador.bat
+
+-   Este archivo batch realiza la operación inversa del anterior, copiando todo el contenido del NAS hacia el grabador.
 
 ------------------------------------------------------------------------
 
@@ -244,7 +276,7 @@ C:\Scripts
 
 ### 2️⃣ Verificar requisitos
 
--   ✔ Existe `E:\Store02`
+-   ✔ Existe la carpeta origen, por ejemplo `E:\Store02`
 -   ✔ Existen carpetas `cam01`, `cam02`, etc.
 -   ✔ Existe o se puede crear `D:\Backup`
 -   ✔ Permisos de lectura y escritura
@@ -259,7 +291,7 @@ Abrir **PowerShell como administrador** y ejecutar:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
 ```
 
-Luego ir a la ubicación del archivo y ejecutarlo:
+Luego ir a la ubicación del archivo y ejecutarlo, por ejemplo:
 
 ``` powershell
 cd C:\Scripts
@@ -273,11 +305,12 @@ cd C:\Scripts
 Configurar una nueva tarea con:
 
 -   **Programa:** `powershell.exe`
--   **Argumentos:**
 
+-   **Argumentos:**
 ``` text
--ExecutionPolicy Bypass -File "C:\Scripts\BACKUP.ps1"
+-ExecutionPolicy Bypass -File "C:\Scripts\BACKUP_constante.ps1"
 ```
+-   **Iniciar en:** `C:\Scripts`
 
 ### ⚙️ Recomendaciones
 
