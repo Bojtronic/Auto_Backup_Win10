@@ -1,1 +1,1 @@
-C:\Windows\System32\Robocopy "D:\Backup" "\\Atm-naranjo\E\Store01" /E /COPY:DAT /DCOPY:T /MT:16 /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
+C:\Windows\System32\Robocopy "D:\Backup" "\\Atm-naranjo\E\Store01" /E /COPY:DAT /DCOPY:T /MT:4 /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
