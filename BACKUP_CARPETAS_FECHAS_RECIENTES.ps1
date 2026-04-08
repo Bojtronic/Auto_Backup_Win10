@@ -113,6 +113,7 @@ Get-ChildItem $origenBase -Directory | ForEach-Object {
                     /COPY:DAT `
                     /DCOPY:T `
                     /R:1 `
+                    /MT:16 `
                     /W:1 `
                     /XJ `
                     /XD "System Volume Information" "$RECYCLE.BIN"

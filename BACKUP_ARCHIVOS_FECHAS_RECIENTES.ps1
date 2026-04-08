@@ -100,6 +100,7 @@ Get-ChildItem $origenBase -Directory | ForEach-Object {
                             "$destinoArchivo" `
                             "$nombreArchivo" `
                             /COPY:DAT `
+                            /MT:16 `
                             /R:1 `
                             /W:1 `
                             /NFL `
