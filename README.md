@@ -16,17 +16,22 @@ y **PowerShell** en sistemas Windows.
 ## 📑 Contenido
 
 -   [🚀 ¿Qué es Robocopy?](#-qué-es-robocopy)
--   [📄 Archivos `.bat`](#-archivos-bat)
-    -   [📁 BACKUP_COMPLETO.bat](#-backup_completobat)
--   [⚙️ Parámetros importantes de
-    Robocopy](#-parámetros-importantes-de-robocopy)
--   [❗ Buenas prácticas al copiar discos
-    completos](#-buenas-prácticas-al-copiar-discos-completos)
--   [🧠 Scripts PowerShell (.ps1)](#-scripts-powershell-ps1)
--   [🧭 Guía para ejecutar scripts
-    `.ps1`](#-guía-para-ejecutar-scripts-ps1)
--   [⏰ Programar el backup con el Programador de
-    tareas](#-programar-el-backup-con-el-programador-de-tareas)
+-   [🧠 Arquitectura general](#-arquitectura-general)
+-   [📂 Scripts de PowerShell `.ps1`](#-scripts-de-powershell)
+    -   [⚡ BACKUP_constante.ps1](#1--backup_constanteps1)
+    -   [🚀 BACKUP_CARPETAS_FECHAS_RECIENTES.ps1](#2--backup_carpetas_fechas_recientesps1)
+    -   [🔎 BACKUP_ARCHIVOS_FECHAS_RECIENTES.ps1](#3--backup_archivos_fechas_recientesps1)
+-   [📄 Archivos batch `.bat`](#-archivos-bat)
+    -   [📦 BACKUP completo desde grabador a NAS.bat](#4--backup-completo-desde-grabador-a-nasbat)
+    -   [🔄 BACKUP completo desde NAS a grabador.bat](#5--backup-completo-desde-nas-a-grabadorbat)
+-   [⏱️ Estrategia recomendada](#️-estrategia-recomendada)
+-   [⚠️ Consideraciones](#️-consideraciones)
+-   [⚙️ Parámetros importantes de Robocopy](#️-parámetros-importantes-de-robocopy)
+-   [❗ Buenas prácticas al copiar discos completos](#-buenas-prácticas-al-copiar-discos-completos)
+-   [📝 Uso de comillas en rutas](#-uso-de-comillas-en-rutas)
+-   [🧪 Ejemplo de backup](#-ejemplo-de-backup)
+-   [🧭 Guía para ejecutar scripts `.ps1`](#-guía-para-ejecutar-scripts-ps1)
+-   [⏰ Programar el backup con el Programador de tareas](#-programar-el-backup-con-el-programador-de-tareas)
 -   [✅ Resultado final](#-resultado-final)
 
 ------------------------------------------------------------------------
@@ -91,48 +96,103 @@ Opciones que controlan el comportamiento de la copia:
 
 ------------------------------------------------------------------------
 
+## 🧠 Arquitectura general
+
+El sistema se basa en cuatro niveles:
+
+- ⚡ Backup continuo (muy rápido y ligero)
+- 🚀 Backup por carpetas (rápido)
+- 🔎 Backup por archivos (lento)
+- 📦 Backup completo (sincronización total)
+
+---
+
+## 📂 Scripts de PowerShell
+
+Un archivo `.ps1` es un script de PowerShell que permite automatizar tareas en Windows mediante comandos más avanzados que los archivos `.bat`, incluyendo manejo de archivos, lógica condicional y ejecución de procesos.
+
+### 1. ⚡ BACKUP_constante.ps1
+Backup incremental optimizado para ejecución frecuente.
+
+- Analiza carpetas de los últimos N días (ej: 120)
+- Verifica archivo por archivo solo el día actual
+- Copia únicamente archivos faltantes
+- No elimina archivos existentes
+- Elimina carpetas fuera del rango
+
+✔ Muy bajo consumo  
+✔ Ideal para ejecución continua  
+
+---
+
+### 2. 🚀 BACKUP_CARPETAS_FECHAS_RECIENTES.ps1
+Backup rápido sin validación interna de cada carpeta.
+
+- Copia carpetas completas recientes (formato MMDD)
+- Usa Robocopy recursivo
+- Elimina carpetas fuera del rango
+
+✔ Rápido  
+❗ No valida contenido interno  
+
+---
+
+### 3. 🔎 BACKUP_ARCHIVOS_FECHAS_RECIENTES.ps1
+Backup con verificación completa de integridad.
+
+- Analiza archivos dentro del rango de días
+- Valida formato: `EventYYYY`
+- Verifica coherencia de año
+- Elimina contenido destino antes de copiar
+- Copia solo archivos válidos
+
+✔ Alta integridad de datos  
+❗ Mayor tiempo de ejecución  
+
+---
+
 ## 📄 Archivos `.bat`
 
-Un archivo **`.bat`** es un script por lotes que ejecuta comandos de
-Windows de forma secuencial.
+Un archivo `.bat` ejecuta comandos de Windows de forma secuencial.
 
-### 🔧 Cómo crear un archivo `.bat`
+---
 
-1.  Crear un archivo de texto plano
-2.  Cambiar la extensión de `.txt` a `.bat`
-3.  Si las extensiones están ocultas:
-    -   Explorador de archivos → **Vista**
-    -   **Opciones**
-    -   **Cambiar opciones de carpeta y búsqueda**
-    -   Pestaña **Ver**
-    -   Desmarcar **Ocultar extensiones de archivo conocidas**
+### 4. 📦 BACKUP completo desde grabador a NAS.bat
 
-✏️ El archivo puede editarse con **Bloc de notas**.
+Copia completa desde el grabador hacia el almacenamiento de respaldo.
 
-------------------------------------------------------------------------
-
-## 📁 BACKUP_COMPLETO.bat
-
-Este archivo realiza una **copia completa del contenido visible de una
-unidad**, excluyendo:
-
--   Metadatos del volumen NTFS
--   Carpetas del sistema
--   Papelera de reciclaje
-
-### 📜 Contenido del archivo
-
-``` bat
-C:\Windows\System32\Robocopy "\\Atm-naranjo\E" "D:\Backup" /E /COPY:DAT /DCOPY:T /MT:16 /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
+```bat
+Robocopy "\Atm-naranjo\E\Store01" "D:\Backup" /E /COPY:DAT /DCOPY:T /MT:16 /R:1 /W:1 /XJ /XD "System Volume Information" "$RECYCLE.BIN"
 ```
 
-### ▶️ Ejecución
+✔ Backup total inicial  
+✔ Sincronización completa  
 
-Para ejecutar el backup basta con **hacer doble clic** sobre el archivo:
+---
 
-``` text
-BACKUP_COMPLETO.bat
-```
+### 5. 🔄 BACKUP completo desde NAS a grabador.bat
+
+Restaura la información desde el backup hacia el grabador.
+
+✔ Recuperación ante fallos  
+✔ Reconstrucción del sistema  
+
+---
+
+## ⏱️ Estrategia recomendada
+
+- `BACKUP_constante.ps1` → cada 5–15 minutos  
+- `BACKUP_CARPETAS_FECHAS_RECIENTES.ps1` → cada hora  
+- `BACKUP_ARCHIVOS_FECHAS_RECIENTES.ps1` → 1 vez al día  
+- Backups completos (`.bat`) → semanal o mensual  
+
+---
+
+## ⚠️ Consideraciones
+
+- La validación completa solo ocurre en el script por archivos
+- Dependencia del formato de nombres (`EventYYYY`) (sistema GeoVision)
+
 
 ------------------------------------------------------------------------
 
@@ -205,7 +265,7 @@ evitar errores de codificación al copiar y pegar.
 
 ------------------------------------------------------------------------
 
-## 🧪 Ejemplo de backup de prueba
+## 🧪 Ejemplo de backup
 
 ``` bat
 Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitoreo\Desktop\BACKUP TEST DESTINO" /E /MIR /R:1 /W:1
@@ -213,52 +273,6 @@ Robocopy.exe "C:\Users\Monitoreo\Documents\BACKUP TEST ORIGEN" "C:\Users\Monitor
 
 ------------------------------------------------------------------------
 
-## 🧠 Scripts PowerShell (.ps1)
-
-Un archivo **`.ps1`** es un script de PowerShell que permite automatizar
-tareas avanzadas, incluyendo:
-
--   Lógica condicional
--   Manejo de fechas
--   Validaciones
--   Registro de logs
-
-### 📂 Scripts incluidos
-
-#### 🔹 BACKUP_constante.ps1
-
--   Script de respaldo optimizado diseñado para ejecutarse de forma frecuente y continua, manteniendo actualizado el backup de los archivos recientes con el mínimo consumo posible de recursos.
--   Analiza únicamente las carpetas correspondientes al rango de días configurado, pero solo realiza validación detallada de archivos en la carpeta correspondiente al día actual.
--   Solo se copian archivos que existen en el origen pero aún no están en el destino.
--   Se eliminan automáticamente las carpetas que quedan fuera del rango de días configurado.
-
-#### 🔹 BACKUP_CARPETAS_FECHAS_RECIENTES.ps1
-
--   Copia **carpetas completas** con nombre `MMDD`
--   Solo dentro del rango de días configurado (por ejemplo, últimos
-    **120 días**)
--   Elimina carpetas antiguas **solo si la copia fue exitosa**
-
-#### 🔹 BACKUP_ARCHIVOS_FECHAS_RECIENTES.ps1
-
--   Analiza **archivo por archivo**
--   Copia únicamente archivos del **año válido**
--   Maneja correctamente el **cruce de año** (año actual o anterior)
-
-
-## 🧠 Archivos Batch (.bat)
-
-Además de los scripts de PowerShell, se incluyen dos archivos **`.bat`** que utilizan Robocopy para realizar sincronizaciones completas entre el grabador (DVR) y el almacenamiento de respaldo (NAS).
-
-#### 🔹 BACKUP completo desde grabador a NAS.bat
-
--   Utiliza Robocopy para copiar todo el contenido de la carpeta de origen hacia la carpeta de destino
-
-#### 🔹 BACKUP completo desde NAS a grabador.bat
-
--   Este archivo batch realiza la operación inversa del anterior, copiando todo el contenido del NAS hacia el grabador.
-
-------------------------------------------------------------------------
 
 ## 🧭 Guía para ejecutar scripts `.ps1`
 
