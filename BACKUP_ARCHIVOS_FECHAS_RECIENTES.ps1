@@ -1,5 +1,7 @@
 # ============================================================
 # CONFIGURACIÓN GENERAL (AJUSTABLE)
+# # ESTE ARCHIVO BUSCA Y COPIA  LAS CARPETAS MAS RECIENTES CON TODO SU CONTENIDO REVISANDO LO QUE CONTIENE (PARA ASEGURAR QUE LAS GRABACIONES ESTEN DENTRO D ELOS 120 DIAS)
+# ESTE ES MAS LENTO QUE EL QUE COPIA LAS CARPETAS SIN REVISAR 
 # ============================================================
 
 $origenBase  = "\\Atm-naranjo\E\Store02"
