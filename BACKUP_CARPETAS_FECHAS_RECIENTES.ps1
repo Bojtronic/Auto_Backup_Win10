@@ -1,5 +1,7 @@
 # ============================================================
 # CONFIGURACIÓN GENERAL (AJUSTABLE)
+# ESTE ARCHIVO BUSCA Y COPIA  LAS CARPETAS MAS RECIENTES CON TODO SU CONTENIDO SI REVISAR LO QUE CONTIENE (PUEDE CONTENER GRABACIONES DE MUCHOS AÑOS ATRAS)
+
 # ============================================================
 
 # Carpeta base en el EQUIPO REMOTO (UNC)
